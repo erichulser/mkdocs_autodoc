@@ -23,7 +23,7 @@ you use this remotely you will need to confugre a virtualenv that can load your 
 The second option is to statically build your API documentation as Markdown files that can be loaded anywhere.
 This exists as a command-line extension to the `mkdocs` commands, and works similarly, execpt instead of generating
 dynamic HTML content, it will export out *.md files to your documents root.  This method will also require
-use of the [mkdocs_tree](https://github.com/ProjexSoftware/mkdocs_tree) extension.
+use of the [mkdocs_tree](https://github.com/erichulser/mkdocs_tree) extension.
 
 You will need to call this whenever you want to re-generate your API documentation, however it will not need access
 to your code libraries on remote servers.
