@@ -1,1 +1,4 @@
 *.pyc
+/mkdocs_autodoc.egg-info
+/build
+/dist
