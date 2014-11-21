@@ -1,7 +1,16 @@
 The `mkdocs._autodoc` extension will allow you to dynamically generate API documentation from your
 Python modules and classes within the [mkdocs](https://github.com/tomchristie/mkdocs) project.
 
-### Dynamic Generation
+Installation
+-------------
+
+You can install the `mkdocs_autodoc` package using `pip` or `easy_install`
+
+    $ pip install mkdocs_autodoc
+    $ easy_install mkdocs_autodoc
+
+Dynamic Generation
+--------------
 
 To have the content always generate dynamically, without the use of any markdown files, you can use the
 `autodoc` page command.  This will allow you to dynamically insert a python module into the page heirarchy
@@ -18,7 +27,8 @@ When this syntax is invoked on load, the `mkdocs` module will be loaded and all 
 and added to the server.  This option is nice because you will always get your latest documentation, however, if
 you use this remotely you will need to confugre a virtualenv that can load your package.
 
-### Markdown Generate
+Markdown Generate
+----------------
 
 The second option is to statically build your API documentation as Markdown files that can be loaded anywhere.
 This exists as a command-line extension to the `mkdocs` commands, and works similarly, execpt instead of generating
