@@ -21,9 +21,7 @@ def create_api_page(event):
         base_path, module_name = match.groups()
         page = nav.load_module(module_name, base_path, title=event.page_title, url_context=event.url_context)
         event.pages = [page] + page.collect_pages()
-        return True
-    else:
-        return False
+        event.consumed = True
 
 def create_api_content(event):
     """
@@ -49,9 +47,4 @@ def create_api_content(event):
 
         event.html_content = html_content
         event.table_of_contents = toc.TableOfContents(toc_html)
-        return True
-    else:
-        return False
-
-def generate_markdown(event):
-    pass
+        event.consumed

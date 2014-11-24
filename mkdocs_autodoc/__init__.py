@@ -13,11 +13,9 @@ def main(event):
             page = load_module(module_name, base_path)
             page.export_markdown(out_path)
 
-        return True
-    else:
-        return False
+        event.consumed = True
 
-def includeme(config):
+def init_extension(config):
     """
     Initializes the extension for the mkdocs system.
 
@@ -31,7 +29,7 @@ def includeme(config):
     # register callback options
     events.register_callback(events.BuildPage, build.create_api_page)
     events.register_callback(events.GenerateContent, build.create_api_content)
-    events.register_callback(events.Execute, main)
+    events.register_callback(events.CLI, main)
 
     # register the additional command line option
-    events.Execute.commands.add('autodoc-generate')
+    events.CLI.commands.add('autodoc-generate')
