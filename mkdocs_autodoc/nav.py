@@ -47,7 +47,7 @@ def _pre_process_objects(text):
             try:
                 module = sys.modules[module_name]
                 obj = getattr(module, name)
-                url = API_PAGES[obj].abs_url
+                url = API_PAGES[obj].url
                 text = text.replace('<' + result + '>', '[{0}]({1})'.format(name, url))
             except (KeyError, AttributeError):
                 text = text.replace('<' + result + '>', '`{0}`'.format(name))
@@ -59,7 +59,7 @@ def _pre_process_objects(text):
                     break
 
             try:
-                url = API_PAGES[py_obj].abs_url
+                url = API_PAGES[py_obj].url
                 text = text.replace('<' + result + '>', '[{0}]({1})'.format(result, url))
             except (KeyError, AttributeError):
                 text = text.replace('<' + result + '>', '`{0}`'.format(result))
@@ -223,7 +223,7 @@ class Member(object):
     @property
     def url(self):
         try:
-            return API_PAGES[self.object].abs_url
+            return API_PAGES[self.object].url
         except KeyError:
             return ''
 
@@ -405,7 +405,7 @@ class ApiPage(nav.Page):
 
     @property
     def url(self):
-        return '/' + self.abs_url
+        return '/' + self.abs_url.lstrip('/')
 
 #----------------------------------------
 
@@ -531,7 +531,7 @@ class ModulePage(ApiPage):
         for i in xrange(len(modsplit) - 1):
             try:
                 module = sys.modules['.'.join(modsplit[:i+1])]
-                path = '<a href="{0}">{1}</a>'.format(API_PAGES[module].abs_url, modsplit[i])
+                path = '<a href="{0}">{1}</a>'.format(API_PAGES[module].url, modsplit[i])
                 breadcrumbs.append(path)
             except KeyError:
                 breadcrumbs.append('<a name="{0}" class="text-danger">{0}"</a>'.format(modsplit[i]))
@@ -574,7 +574,7 @@ class ClassPage(ApiPage):
         for i in xrange(len(modsplit)):
             try:
                 module = sys.modules['.'.join(modsplit[:i+1])]
-                link = '<a href="{0}">{1}</a>'.format(API_PAGES[module].abs_url, modsplit[i])
+                link = '<a href="{0}">{1}</a>'.format(API_PAGES[module].url, modsplit[i])
             except KeyError:
                 link = '<a name="{0}" class="text-danger">{0}</a>'.format(modsplit[i])
             breadcrumbs.append(link)
@@ -588,7 +588,7 @@ class ClassPage(ApiPage):
                 continue
 
             try:
-                link = '<a href="{0}">{1}</a>'.format(API_PAGES[obj].abs_url, obj.__name__)
+                link = '<a href="{0}">{1}</a>'.format(API_PAGES[obj].url, obj.__name__)
             except KeyError:
                 link = '<a name="{0}" class="text-danger">{0}</a>'.format(obj.__name__)
             inherits.append(link)
@@ -598,7 +598,7 @@ class ClassPage(ApiPage):
         inherited_by = []
         for obj in self.inherited_by:
             try:
-                link = '<a href="{0}">{1}</a>'.format(API_PAGES[obj].abs_url, obj.__name__)
+                link = '<a href="{0}">{1}</a>'.format(API_PAGES[obj].url, obj.__name__)
             except KeyError:
                 link = '<a name="{0}" class="text-danger">{0}</a>'.format(obj.__name__)
             inherited_by.append(link)
