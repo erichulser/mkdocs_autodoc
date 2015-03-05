@@ -12,8 +12,8 @@ You can install the `mkdocs_autodoc` package using `pip` or `easy_install`
 Dynamic Generation
 --------------
 
-To have the content always generate dynamically, without the use of any markdown files, you can use the
-`autodoc` page command.  This will allow you to dynamically insert a python module into the page heirarchy
+To have the content always generated dynamically, without the use of any markdown files, you can use the
+`autodoc` page command.  This will allow you to dynamically insert a python module into the page hierarchy
 at runtime.
 
 You will need to modify your `mkdocs.yml` to include something similar to:
@@ -25,13 +25,13 @@ You will need to modify your `mkdocs.yml` to include something similar to:
 
 When this syntax is invoked on load, the `mkdocs` module will be loaded and all of its pages dynamically generated
 and added to the server.  This option is nice because you will always get your latest documentation, however, if
-you use this remotely you will need to confugre a virtualenv that can load your package.
+you use this remotely you will need to configure a [virtualenv](https://pypi.python.org/pypi/virtualenv) that can load your package.
 
 Markdown Generate
 ----------------
 
 The second option is to statically build your API documentation as Markdown files that can be loaded anywhere.
-This exists as a command-line extension to the `mkdocs` commands, and works similarly, execpt instead of generating
+This exists as a command-line extension to the `mkdocs` commands, and works similarly, except instead of generating
 dynamic HTML content, it will export out *.md files to your documents root.  This method will also require
 use of the [mkdocs_tree](https://github.com/erichulser/mkdocs_tree) extension.
 
