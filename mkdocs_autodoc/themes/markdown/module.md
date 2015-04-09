@@ -1,13 +1,9 @@
-{{ title.split('.')[-1] }}
-=================================
-{% if breadcrumbs %}
-from {{ '.'.join(breadcrumbs) }}
-{% endif %}
+<h1>{{ title.split('.')[-1] }} <small>[module documentation]</small></h1>
 
 {% if brief %}
 {{ brief }} [More...](#details)
 {% elif page.raw_docs %}
-{{ page.raw_docs }}
+{{ page.wikitext_docs }}
 {% endif %}
 
 {% include '_summary.md' %}
@@ -15,7 +11,7 @@ from {{ '.'.join(breadcrumbs) }}
 {% if brief %}
 Details
 ------------------
-{{ page.raw_docs }}
+{{ page.wikitext_docs }}
 {% endif %}
 
 Functions

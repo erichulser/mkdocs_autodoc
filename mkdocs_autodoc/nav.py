@@ -5,6 +5,10 @@ import re
 import sys
 import shutil
 
+import projex.wikitext
+from projex.enum import enum
+
+from collections import OrderedDict, defaultdict
 from webhelpers.html.tools import strip_tags
 from mkdocs import nav, build
 from . import config
@@ -24,6 +28,7 @@ MEMBER_KINDS = [
     'Static Method',
     'Deprecated Method',
     'Builtin',
+    'Enum'
 ]
 
 MEMBER_PRIVACY = [
@@ -66,7 +71,19 @@ def _pre_process_objects(text):
 
     return text
 
-#--------------------------------
+
+class NavUrlHandler(projex.wikitext.UrlHandler):
+    def resolveClass(self, cls):
+        modulename, _, classname = cls.rpartition('.')
+
+        try:
+            return API_PAGES[getattr(sys.modules[modulename], classname)].url, True
+        except StandardError:
+            if 'qt' in modulename.lower():
+                return 'http://doc.qt.io/qt-4.8/{0}.html'.format(classname.lower()), True
+            else:
+                return '', False
+
 
 class Member(object):
     def __init__(self, data, functionType='Method'):
@@ -93,6 +110,8 @@ class Member(object):
         if results:
             name = results.group(2)
 
+        type_name = type(obj).__name__
+
         # determine the privacy level
         if name.startswith('__'):
             privacy = 'Private'
@@ -108,20 +127,22 @@ class Member(object):
         elif inspect.isclass(obj):
             kind = 'Class'
 
+        elif isinstance(obj, enum):
+            kind = 'Enum'
+
+        elif type_name in ('pyqtSignal', 'Signal'):
+            kind = 'Signal'
+            qtype_docs = str(obj)
+
+        elif type_name in ('pyqtSlot', 'Slot'):
+            kind = 'Slot'
+            qtype_docs = str(obj)
+
+        elif type_name in ('pyqtProperty', 'Property'):
+            kind = 'Property'
+
         elif kind == 'method':
-            type_name = type(obj).__name__
-
-            if type_name in ('pyqtSignal', 'Signal'):
-                kind = 'Signal'
-                qtype_docs = str(obj)
-
-            elif type_name in ('pyqtSlot', 'Slot'):
-                kind = 'Slot'
-                qtype_docs = str(obj)
-
-            elif type_name in ('pyqtProperty', 'Property'):
-                kind = 'Property'
-            elif name.startswith('__') and name.endswith('__'):
+            if name.startswith('__') and name.endswith('__'):
                 kind = 'Builtin'
             else:
                 kind = 'Method'
@@ -204,6 +225,13 @@ class Member(object):
                 return getattr(self.object, '__doc__', '')
 
     @property
+    def wikitext_docs(self):
+        text = self.raw_docs
+        if not text:
+            return ''
+        return projex.wikitext.render(text, urlHandler=URL_HANDLER, wikiStyle='bootstrap')
+
+    @property
     def reimpliments(self):
         return ''
 
@@ -243,7 +271,6 @@ class Member(object):
     def section(self):
         return ' '.join((self.privacy, self.kind)).strip()
 
-#--------------------------------
 
 class ApiPage(nav.Page):
     def __init__(self, **kwds):
@@ -265,6 +292,7 @@ class ApiPage(nav.Page):
         # store the custom attributes
         self._members = None
         self._all_members = None
+
         self.base_path = base_path
         self.py_object = py_object
         if base_path:
@@ -335,11 +363,23 @@ class ApiPage(nav.Page):
         return build.convert_markdown(text, extensions=config.base_config['markdown_extensions'])[0]
 
     @property
+    def wikitext_docs(self):
+        text = self.raw_docs
+        if not text:
+            return ''
+        return projex.wikitext.render(text, urlHandler=URL_HANDLER, wikiStyle='bootstrap')
+
+    @property
+    def member_map(self):
+        return {}
+
+    @property
     def object_name(self):
         return self.py_object.__name__
 
     @property
     def render_context(self):
+
         context = {
             'page': self,
             'object_name': self.object_name,
@@ -348,6 +388,7 @@ class ApiPage(nav.Page):
             'brief': self.brief,
             'details': self.html_docs,
             'sections': self.sections,
+            'member_map': self.member_map
         }
         return context
 
@@ -565,6 +606,27 @@ class ClassPage(ApiPage):
         return self._all_members
 
     @property
+    def member_map(self):
+        def get_key(cls):
+            page = API_PAGES.get(cls)
+            if page:
+                return page.url, cls.__name__
+            else:
+                return '', cls.__name__
+
+        bases = [x for x in inspect.getmro(self.py_object) if x != self.py_object]
+        class_keys = {x: get_key(x) for x in bases}
+        member_map = OrderedDict([(class_keys[x], defaultdict(list)) for x in bases])
+        for member in self.all_members:
+            key = class_keys.get(member.defining_class)
+            if not key:
+                continue
+
+            member_map[key][member.section].append(member)
+
+        return member_map
+
+    @property
     def render_context(self):
         context = super(ClassPage, self).render_context
 
@@ -626,6 +688,8 @@ class ClassPage(ApiPage):
     @property
     def source_path(self):
         return os.path.join(*(self.py_object.__module__.split('.') + [self.py_object.__name__]))
+
+URL_HANDLER = NavUrlHandler()
 
 def load_module(module_name, base_path, title='', url_context=None):
     __import__(module_name)

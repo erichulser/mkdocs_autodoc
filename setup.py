@@ -13,6 +13,6 @@ setup(
     url = 'https://github.com/erichulser/mkdocs_autodoc',
     include_package_data=True,
     packages = find_packages(),
-    install_requires = ['mkdocs'],
+    install_requires = ['mkdocs', 'projex'],
     classifiers=[],
 )

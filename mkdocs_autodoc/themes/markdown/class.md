@@ -1,6 +1,4 @@
-{{ title }}
-==========================
-from {{ '.'.join(breadcrumbs) }}
+<h1>{{ title }} <small>[class documentation]</small></h1> 
 
 {% if inherits %}
 Inherits {{ ', '.join(inherits) }}
