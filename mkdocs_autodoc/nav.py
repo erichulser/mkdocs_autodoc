@@ -290,6 +290,7 @@ class ApiPage(nav.Page):
             path = module.__name__.replace('.', '/') + '/{0}/index.html'.format(py_object.__name__)
 
         # store the custom attributes
+        self._pages = None
         self._members = None
         self._all_members = None
 
@@ -316,19 +317,13 @@ class ApiPage(nav.Page):
             return ''
 
     def collect_pages(self):
-        pass
+        return []
 
     def collect_members(self):
         return []
 
     def export_markdown(self, outpath):
         basepath = os.path.abspath(os.path.normpath(outpath))
-
-        # clear the existing markdown
-        if os.path.exists(outpath):
-            shutil.rmtree(outpath)
-
-        os.mkdir(basepath)
         for page in [self] + self.collect_pages():
             filepath = os.path.join(basepath, page.source_path)
             if not os.path.exists(filepath):
@@ -360,7 +355,7 @@ class ApiPage(nav.Page):
             return ''
 
         text = _pre_process_objects(text)
-        return build.convert_markdown(text, extensions=config.base_config['markdown_extensions'])[0]
+        return build.convert_markdown(text, extensions=config.base_config.get('markdown_extensions', []))[0]
 
     @property
     def wikitext_docs(self):
@@ -455,6 +450,9 @@ class ModulePage(ApiPage):
         """
         Collects all the members for this dox object and caches them.
         """
+        if self._members:
+            return self._members
+
         # load all the items
         try:
             members = dict(inspect.getmembers(self.py_object))
@@ -510,9 +508,13 @@ class ModulePage(ApiPage):
                 func_type = 'Function'
 
             output.append(Member((name, kind, None, obj), func_type))
-        return output
+        self._members = output
+        return self._members
 
     def collect_pages(self):
+        if self._pages:
+            return self._pages
+
         pages = []
         previous = self
         for member in self.members:
@@ -562,6 +564,7 @@ class ModulePage(ApiPage):
                 previous = page
                 pages.append(page)
 
+        self._pages = pages
         return pages
 
     @property
@@ -658,7 +661,7 @@ class ClassPage(ApiPage):
 
         # create the inheritance information
         inherited_by = []
-        for obj in self.inherited_by:
+        for obj in sorted(self.inherited_by, key=lambda x: x.__name__):
             try:
                 link = '<a href="{0}">{1}</a>'.format(API_PAGES[obj].url, obj.__name__)
             except KeyError:
@@ -669,13 +672,17 @@ class ClassPage(ApiPage):
         return context
 
     def collect_members(self):
+        if self._members:
+            return self._members
+
         try:
             members = inspect.classify_class_attrs(self.py_object)
         except AttributeError:
             members = []
 
         self._all_members = [Member(x) for x in members]
-        return [x for x in self._all_members if x.defining_class == self.py_object]
+        self._members = [x for x in self._all_members if x.defining_class == self.py_object]
+        return self._members
 
     @property
     def inherits(self):
@@ -691,14 +698,17 @@ class ClassPage(ApiPage):
 
 URL_HANDLER = NavUrlHandler()
 
-def load_module(module_name, base_path, title='', url_context=None):
+def load_module(module_name, base_path, title='', url_context=None, autocollect=False):
     __import__(module_name)
     module = sys.modules[module_name]
     title = title or module_name
     url = base_path.rstrip('/') + '/' + module.__name__.replace('.', '/')
-    return ModulePage(py_object=module,
+    page = ModulePage(py_object=module,
                       base_path=base_path,
                       title=title,
                       path=module.__file__,
                       url=url,
                       url_context=url_context)
+    if autocollect:
+        page.collect_pages()
+    return page

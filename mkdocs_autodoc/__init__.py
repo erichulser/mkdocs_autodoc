@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from mkdocs import events
 
 from .nav import load_module
@@ -9,8 +12,16 @@ def main(event):
         base_path = event.options.get('basepath', 'api')
         out_path = event.options.get('outpath', './docs/api')
 
-        for module_name in modules:
-            page = load_module(module_name, base_path)
+        # clear the existing markdown
+        if os.path.exists(out_path):
+            shutil.rmtree(out_path)
+
+        os.mkdir(out_path)
+
+        # process everything first, then export, otherwise some references may not yet exist
+        pages = [load_module(module_name, base_path, autocollect=True) for module_name in modules]
+
+        for page in pages:
             page.export_markdown(out_path)
 
         event.consumed = True

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'mkdocs_autodoc',
-    version = '1.0.1',
+    version = '1.0.3',
     author = 'Eric Hulser',
     author_email = 'eric.hulser@projexsoftware.com',
     maintainer = 'Eric Hulser',
