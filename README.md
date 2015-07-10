@@ -38,6 +38,11 @@ When this syntax is invoked on load, the `mkdocs` module will be loaded and all 
 and added to the server.  This option is nice because you will always get your latest documentation, however, if
 you use this remotely you will need to configure a [virtualenv](https://pypi.python.org/pypi/virtualenv) that can load your package.
 
+Usage
+-------------
+
+To trigger the auto-documentation you will need to define `autodoc:<module_name>` as your filename.  This will trigger the `autodoc` plugin to import and document the module defined as `module_name`.  The resulting documentation will be generated into the path specified for that module.  So, in the above example, `'api/audodoc:mkdocs'` will document the `mkdocs` package into the `api` directory.
+
 Markdown Generate
 ----------------
 
