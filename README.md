@@ -1,6 +1,17 @@
 The `mkdocs._autodoc` extension will allow you to dynamically generate API documentation from your
 Python modules and classes within the [mkdocs](https://github.com/tomchristie/mkdocs) project.
 
+Important
+-------------
+
+This project is built on a proposed extension system for mkdocs, which currently resides on a [mkdocs fork found here](https://github.com/ProjexSoftware/mkdocs).  To use this plugin, you will need to clone the forked repository and install it to your environment locally:
+
+    $ git clone https://github.com/ProjexSoftware/mkdocs.git
+    $ cd mkdocs
+    $ python setup.py develop
+
+There is no intention to maintain this fork, it is a temporary measure until an extension system exists within `mkdocs` itself.
+
 Installation
 -------------
 
