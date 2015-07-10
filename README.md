@@ -41,7 +41,11 @@ you use this remotely you will need to configure a [virtualenv](https://pypi.pyt
 Usage
 -------------
 
-To trigger the auto-documentation you will need to define `autodoc:<module_name>` as your filename.  This will trigger the `autodoc` plugin to import and document the module defined as `module_name`.  The resulting documentation will be generated into the path specified for that module.  So, in the above example, `'api/audodoc:mkdocs'` will document the `mkdocs` package into the `api` directory.
+You define a page the same way for the `autodoc` plugin as you do for any `mkdocs` page:
+
+    - [<filename>, <group>, <title>]
+
+However, to trigger the auto-documentation you will need to define `autodoc:<module_name>` as your filename.  This will trigger the `autodoc` plugin to import and document the module defined as `module_name`.  The resulting documentation will be generated into the path specified for that module.  So, in the above example, `'api/audodoc:mkdocs'` will document the `mkdocs` package into the `api` directory.
 
 Markdown Generate
 ----------------
