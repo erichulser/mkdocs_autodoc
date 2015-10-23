@@ -3,13 +3,13 @@ import jinja2
 import os
 import re
 import sys
-import shutil
 
 import projex.wikitext
 from projex.enum import enum
 
 from collections import OrderedDict, defaultdict
 from webhelpers.html.tools import strip_tags
+from webhelpers.text import truncate
 from mkdocs import nav, build
 from . import config
 
@@ -310,9 +310,9 @@ class ApiPage(nav.Page):
 
     @property
     def brief(self):
-        text = strip_tags(self.html_docs)
-        if len(text) > 200:
-            return text[:200] + '...'
+        text = strip_tags(self.wikitext_docs)
+        if len(text) > 300:
+            return truncate(text, 300)
         else:
             return ''
 
@@ -322,7 +322,7 @@ class ApiPage(nav.Page):
     def collect_members(self):
         return []
 
-    def export_markdown(self, outpath):
+    def export(self, outpath, theme='bootstrap'):
         basepath = os.path.abspath(os.path.normpath(outpath))
         for page in [self] + self.collect_pages():
             filepath = os.path.join(basepath, page.source_path)
@@ -330,16 +330,16 @@ class ApiPage(nav.Page):
                 os.makedirs(filepath)
 
             filename = os.path.join(filepath, page.source_file)
-            content = page.generate_markdown()
+            content = page.generate(theme=theme)
             with open(filename, 'w') as f:
                 f.write(content)
 
-    def generate_markdown(self):
-        theme_path = os.path.join(os.path.dirname(__file__), 'themes', 'markdown')
+    def generate(self, theme='bootstrap'):
+        theme_path = os.path.join(os.path.dirname(__file__), 'themes', theme)
         loader = jinja2.FileSystemLoader(theme_path)
         env = jinja2.Environment(loader=loader)
 
-        template = env.get_template(self.template_name.replace('.html', '.md'))
+        template = env.get_template(self.template_name)
         return template.render(self.render_context)
 
     @property
@@ -426,7 +426,7 @@ class ApiPage(nav.Page):
 
     @property
     def source_file(self):
-        return 'index.md'
+        return 'index.html'
 
     @property
     def source_filepath(self):
@@ -595,9 +595,9 @@ class ModulePage(ApiPage):
     @property
     def source_file(self):
         if '__init__' in self.py_object.__file__:
-            return 'index.md'
+            return 'index.html'
         else:
-            return self.py_object.__name__.split('.')[-1] + '.md'
+            return self.py_object.__name__.split('.')[-1] + '.html'
 
 #----------------------------------------
 

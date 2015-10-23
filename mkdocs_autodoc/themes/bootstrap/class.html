@@ -1,42 +1,30 @@
-<h1 id="{{ object_name }}">{{ title }} <small>(class reference)</h1>
-<small>from {{ '.'.join(breadcrumbs) }}</small>
+<h1>{{ title }} <small>[class documentation]</small></h1> 
 
+<ul class="list-unstyled">
 {% if inherits %}
-<p class="inherits">Inherits {{ ', '.join(inherits) }}</p>
+    <li>Inherits {{ ', '.join(inherits) }}</li>
 {% endif %}
 {% if inherited_by %}
-<p class="inherits">Inherited by {{ ', '.join(inherited_by) }}</p>
+    <li>Inherited by {{ ', '.join(inherited_by) }}</li>
 {% endif %}
-
 {% if brief %}
-<p>{{ brief }} <a href="#details">More...</a></p>
+    <li style="margin-top:15px">{{ brief }}</li>
+    <li><a href="#details">Read More...</a></li>
 {% else %}
-<p>{{ details }}</p>
+    <li style="margin-top:15px">{{ page.wikitext_docs }}</li>
 {% endif %}
+</ul>
 
 {% include '_summary.html' %}
 
 {% if brief %}
-<h2 id="details">Details</h2>
-<p>{{ details }}</p>
+    <div class="page-header">
+        <h1><a name="details"></a> Detailed Description</h1>
+    </div>
+    {{ page.wikitext_docs }}
 {% endif %}
 
-<h2 id="methods">Methods</h2>
-
-{% include '_details.html' %}
-
-<!-- STARTTOC -->
-<div class="toc">
-    <ul>
-        <li><a href="#{{ object_name }}">{{ title }}</a></li>
-        {% for section in sections %}
-        <li><a href="#{{ section[0] }}">{{ section[0] }}</a></li>
-        {% endfor %}
-        {% if brief %}
-        <li><a href="#details">Details</a></li>
-        {% endif %}
-        <li><a href="#methods">Method Documentation</a></li>
-    </ul>
+<div class="page-header">
+    <h1>Methods</h1>
 </div>
-
-
+{% include '_details.html' %}

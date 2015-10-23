@@ -11,6 +11,7 @@ def main(event):
         modules = [arg for arg in event.args if not arg.startswith('--')]
         base_path = event.options.get('basepath', 'api')
         out_path = event.options.get('outpath', './docs/api')
+        theme = event.options.get('theme', 'bootstrap')
 
         # clear the existing markdown
         if os.path.exists(out_path):
@@ -22,7 +23,7 @@ def main(event):
         pages = [load_module(module_name, base_path, autocollect=True) for module_name in modules]
 
         for page in pages:
-            page.export_markdown(out_path)
+            page.export(out_path, theme=theme)
 
         event.consumed = True
 
