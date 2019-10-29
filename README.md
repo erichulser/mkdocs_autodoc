@@ -15,10 +15,10 @@ There is no intention to maintain this fork, it is a temporary measure until an 
 Installation
 -------------
 
-You can install the `mkdocs_autodoc` package using `pip` or `easy_install`
+You can install `mkdocs_autodoc` and `mkdocs_tree` packages using `pip` or `easy_install`
 
-    $ pip install mkdocs_autodoc
-    $ easy_install mkdocs_autodoc
+    $ pip install mkdocs_autodoc mkdocs_tree
+    $ easy_install mkdocs_autodoc mkdocs_tree
 
 Dynamic Generation
 --------------
